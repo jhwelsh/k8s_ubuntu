@@ -1,0 +1,41 @@
+# Get the system ready and get some tools
+apt update
+apt upgrade
+apt install inetutils-ping net-tools htop
+
+# Create the keyrings directory for kubernetes
+mkdir /etc/apt/keyrings # MAY ALREADY EXIST
+
+# Apply the Release key to the keyring
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+# Do some package source shit
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+# Update the goodness
+sudo apt update
+
+# Install docker
+sudo apt install docker.io
+
+# Start the docker service
+systemctl start docker
+
+# Enable the docker service
+systemctl enable docker
+
+# Install the kubernetes tools
+sudo apt install kubernetes-cni kubelet kubeadm kubectl
+
+# Did you make a pod network?
+
+# Get on UP!
+kubeadmin init --control-plane-endpoint=master-node --upload-certs
+
+# Get Down!
+sudo kubeadm init --pod-network-cidr=192.168.200.0/24
+
+# k8s wants this stuff
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
